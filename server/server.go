@@ -2,6 +2,10 @@ package main
 
 import (
 	"context"
+	"log"
+	"net/http"
+	"os"
+
 	"github.com/99designs/gqlgen/handler"
 	"github.com/shpota/skmz/cors"
 	"github.com/shpota/skmz/db"
@@ -9,9 +13,6 @@ import (
 	"github.com/shpota/skmz/gql/gen"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"net/http"
-	"os"
 )
 
 func main() {
@@ -20,7 +21,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer client.Disconnect(context.TODO())
-	http.Handle("/query", gqlHandler(db.New(client)))
+	http.Handle("/query", cors.Disable(gqlHandler(db.New(client))))
 	http.Handle("/playground",
 		handler.Playground("GraphQL playground", "/query"),
 	)
